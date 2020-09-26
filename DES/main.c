@@ -75,9 +75,27 @@ char* feistel(char r[33], int id){
 }
 
 // 16轮迭代序列T
+// 加密
 void Iterative_seq(){
     char t_R[33], t_L[33];
     for (int i = 0; i < 16; i++){
+        strcpy(t_L, L); strcpy(t_R, R);
+
+        strcpy(L, t_R);
+
+        char t[33];
+        strcpy(t, feistel(t_R, i));
+        for (int j = 0; j < 32; j++){
+            if (t_L[i] == t[i]) R[i] = '0';
+            else R[i] = '1';
+        }
+    }
+}
+
+// 解密
+void Iterative_seq2(){
+    char t_R[33], t_L[33];
+    for (int i = 15; i >= 0; i--){
         strcpy(t_L, L); strcpy(t_R, R);
 
         strcpy(L, t_R);
@@ -102,9 +120,16 @@ void IP_inverse_replace(){
 }
 
 int main() {
+    // 解密或加密的操作
+    printf("请选择想要进行的操作: 0--加密  1--解密\n");
+    int flag;
+    scanf("%d", &flag);
+
     // 输入64位明文数据,和密钥
-    printf("请输入想加密的64位明文：\n"); scanf("%s", &M);
+    if(flag == 0) {printf("请输入想加密的64位明文：\n"); scanf("%s", &M);}
+    else  {printf("请输入想解密的64位密文：\n"); scanf("%s", &M);}
     printf("请输入密钥：\n"); scanf("%s", &K);
+
     // 非检验位进行置换
     for (int i = 0; i < 56; i++) K0[i] = K[PC1[i] - 1];
     for (int i = 0; i < 56; i++){
@@ -146,7 +171,8 @@ int main() {
     }
 
     // 16轮迭代T
-    Iterative_seq();
+    if (flag == 0) Iterative_seq();
+    else Iterative_seq2();
 
     // 交换置换M
     for (int i = 0; i < 64; i++){
