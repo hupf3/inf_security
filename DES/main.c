@@ -86,8 +86,8 @@ void Iterative_seq(){
         char t[33];
         strcpy(t, feistel(t_R, i));
         for (int j = 0; j < 32; j++){
-            if (t_L[i] == t[i]) R[i] = '0';
-            else R[i] = '1';
+            if (t_L[j] == t[j]) R[j] = '0';
+            else R[j] = '1';
         }
     }
 }
@@ -103,8 +103,8 @@ void Iterative_seq2(){
         char t[33];
         strcpy(t, feistel(t_R, i));
         for (int j = 0; j < 32; j++){
-            if (t_L[i] == t[i]) R[i] = '0';
-            else R[i] = '1';
+            if (t_L[j] == t[j]) R[j] = '0';
+            else R[j] = '1';
         }
     }
 }
@@ -156,9 +156,9 @@ int main() {
 
         // 压缩置换
         char t[57];
-        for (int i = 0; i < 56; i++){
-            if (i < 28) t[i] = CC[i];
-            else t[i] = DD[i - 28];
+        for (int j = 0; j < 56; j++){
+            if (j < 28) t[j] = CC[j];
+            else t[j] = DD[j - 28];
         }
         for (int j = 0; j < 48; j++) k[i][j] = t[PC2[j] - 1];
     }
