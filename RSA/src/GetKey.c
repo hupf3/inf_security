@@ -92,7 +92,7 @@ void getKey(int k, mpz_t n, mpz_t d, mpz_t e){
     // PKCS#1 建议
     mpz_set_ui(e, 65537);
 
-    // d 是 e 的模phiN 逆元
+    // d 是 e 的模 phiN 逆元
     mpz_invert(d, e, phiN);
 
     mpz_clear(phiN);
