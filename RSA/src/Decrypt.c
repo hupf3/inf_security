@@ -12,6 +12,7 @@ int Decrypt(mpz_t n, mpz_t d, OS *C, int k, int mLen){
     // gmp_printf("c : %Zd\n", c);
     if (mpz_cmp(c, n) >= 0){
         printf("密文代表超出范围，解密出错！\n");
+        mpz_clear(c);
         return 0;
     }
 
@@ -25,11 +26,18 @@ int Decrypt(mpz_t n, mpz_t d, OS *C, int k, int mLen){
     OSinit(EM);
     I2OSP(m, k, EM);
 //  printf("%d\n", EM->len);
-    printf("# 解密后得到的编码信息 EM字节串 为 #：");
+    printf("# 解密后得到的编码信息 EM 字节串为 #：");
     for (int i = 0; i < EM->len; i++){
         printf("%d ", EM->os[i]);
     }
     printf("\n\n");
+    if (EM->os[0] != 0 || EM->os[1] != 2 || EM->os[EM->len - mLen - 1] != 0){
+        printf("解密出错！\n");
+        mpz_clear(m);
+        OS_free(EM);
+        mpz_clear(c);
+        return 0;
+    }
 
     printf("# 解密后的明文 M 为 #：");
     for (int i = EM->len - mLen; i < EM->len; i++) printf("%c", (char)(EM->os[i]));

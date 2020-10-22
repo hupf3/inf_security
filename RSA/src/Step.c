@@ -47,7 +47,9 @@ void OS2IP(OS *str, mpz_t m){
     mpz_clear(tmp);
 }
 
-
+void RSAEP(mpz_t n, mpz_t e, mpz_t m, mpz_t c){
+    mpz_powm(c, m, e, n);
+}
 
 int I2OSP(mpz_t c, int k, OS *C){
     mpz_t base; mpz_init(base); mpz_set_ui(base, 256);
