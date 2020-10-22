@@ -4,5 +4,9 @@
 
 #ifndef ENCRYPT_H
 #define ENCRYPT_H
+#include <gmp.h>
+#include "Octetstring.h"
+
+int Encrypt(mpz_t n, mpz_t e, char *M, int PSLen, int mLen, int k, OS *str);
 
 #endif

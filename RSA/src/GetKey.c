@@ -2,8 +2,8 @@
 // Created by 胡鹏飞 on 2020/10/21.
 //
 
-#include "GetKey.h"
 #include <time.h>
+#include "GetKey.h"
 
 // 获取大素数 p 和 q
 void getPQ(mpz_t t, int n){
@@ -31,6 +31,11 @@ int checkPQ(mpz_t p, mpz_t q, int k){
     mpz_pow_ui(t2, b2, e2);
     if (mpz_cmp(t, t2) <= 0) return 0;
 
+    mpz_clear(t);
+    mpz_clear(t1);
+    mpz_clear(b1);
+    mpz_clear(t2);
+    mpz_clear(b2);
     return 1;
 }
 
@@ -52,8 +57,15 @@ void getKey(int k, mpz_t n, mpz_t d, mpz_t e){
         mpz_t q; mpz_init(q);
         mpz_t N; mpz_init(N);
 
-        getPQ(p, (k + 1) / 2);
-        getPQ(q, (k - 1) / 2);
+        getPQ(p, k / 2);
+        getPQ(q, k / 2);
+        // 按照课件上的方法取p，q，应该是下方注释的方法
+        // 但是执行过程较长，所以选择上面的方法
+        // 下面的方法也能求解，只不过运行的时候需要等待一定时间
+//      getPQ(p, (int)((k + 1) / 2));
+//      getPQ(q, (int)((k - 1) / 2));
+        // mpz_set_str(p, "13407807929942597099574024998205846127479365820592393377723561443721764030073546973268180168610134768523436856700823243770649609554001901502226311745110547", 10);
+        // mpz_set_str(q, "13407806331607339337786002530828064473378217277310144333258332203833400701883216701081876796570178855341571855188871186561982435582158525349439211686594501", 10);
         mpz_mul(N, p, q);
 
         if (checkPQ(p, q, k) && checkN(N, k)){
@@ -62,6 +74,8 @@ void getKey(int k, mpz_t n, mpz_t d, mpz_t e){
             mpz_mul(phiN, p, q);
             mpz_set(n, N);
 
+            // gmp_printf("p 为：%Zd\n", p);
+            // gmp_printf("q 为：%Zd\n", q);
             // 进行销毁
             mpz_clear(N);
             mpz_clear(p);
@@ -80,4 +94,6 @@ void getKey(int k, mpz_t n, mpz_t d, mpz_t e){
 
     // d 是 e 的模phiN 逆元
     mpz_invert(d, e, phiN);
+
+    mpz_clear(phiN);
 }
