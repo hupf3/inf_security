@@ -4,7 +4,7 @@
 
 #ifndef STEP_H
 #define STEP_H
-#include "gmpp.h"
+#include <gmp.h>
 #include "Octetstring.h"
 
 // EM = 0x00 || 0x02 || PS || 0x00 || M.
