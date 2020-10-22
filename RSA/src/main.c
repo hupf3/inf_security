@@ -1,11 +1,11 @@
 #include <stdio.h>
-#include <gmp.h>
 #include <stdlib.h>
 #include <string.h>
 #include "GetKey.h"
 #include "Decrypt.h"
 #include "Encrypt.h"
 #include "Step.h"
+#include "gmpp.h"
 
 const int LEN_MAXN = 120; // 最长输入117个字符
 char M[LEN_MAXN]; // 待输入的消息

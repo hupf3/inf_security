@@ -3,7 +3,7 @@
 //
 #ifndef GETKEY_H
 #define GETKEY_H
-#include <gmp.h>
+#include "gmpp.h"
 
 gmp_randstate_t state; // 产生随机数用
 

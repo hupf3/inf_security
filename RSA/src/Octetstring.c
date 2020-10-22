@@ -2,9 +2,9 @@
 // Created by 胡鹏飞 on 2020/10/21.
 //
 
-#include "Octetstring.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "Octetstring.h"
 
 void swap(int *a, int *b){
     int t = *a;
