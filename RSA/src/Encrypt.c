@@ -18,8 +18,8 @@ int Encrypt(mpz_t n, mpz_t e, char *M, int PSLen, int mLen, int k, OS *str){
     gmp_printf("%Zd\n", m);
     printf("\n");
 
-    mpz_t tmp; mpz_init(tmp); mpz_sub_ui(tmp, n, 1);
-    // if (mpz_cmp(m, tmp)){
+    mpz_t tmp; mpz_init(tmp); mpz_set(tmp, n);
+    // if (mpz_cmp(m, tmp) >= 0){
     //     printf("消息代表超出范围！\n");
     //     return 0;
     // }
