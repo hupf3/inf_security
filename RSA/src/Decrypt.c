@@ -35,6 +35,7 @@ int Decrypt(mpz_t n, mpz_t d, OS *C, int k, int mLen){
     for (int i = EM->len - mLen; i < EM->len; i++) printf("%c", (char)(EM->os[i]));
     printf("\n");
 
+    OS_free(EM);
     mpz_clear(m);
     mpz_clear(c);
     return 1;

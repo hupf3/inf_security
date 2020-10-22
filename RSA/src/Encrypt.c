@@ -32,6 +32,7 @@ int Encrypt(mpz_t n, mpz_t e, char *M, int PSLen, int mLen, int k, OS *str){
     OS *C; C = (OS *)malloc(sizeof(OS));
     OSinit(C);
     if (I2OSP(c, k, C) == 0){
+        OS_free(C);
         mpz_clear(m);
         mpz_clear(c);
         mpz_clear(tmp);
@@ -41,6 +42,7 @@ int Encrypt(mpz_t n, mpz_t e, char *M, int PSLen, int mLen, int k, OS *str){
     for (int i = 0; i < C->len; i++) printf("%d ", (int)C->os[i]);
     printf("\n");
 
+    OS_free(C);
     mpz_clear(m);
     mpz_clear(c);
     mpz_clear(tmp);
