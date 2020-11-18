@@ -32,7 +32,6 @@
 
 - `include`：该目录下存储了本次实验的 `.h` 头文件代码
 - `src`：该目录下存储了本次实验的 `.c` 文件代码
-- `main`：unix 可执行文件
 
 ## 代码运行说明
 
@@ -498,7 +497,7 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
     }
     ```
 
-- `main.c`：设计了三个测试样例去检验实验的准确性，就不贴出所有代码了，我将所有的过程都封装成了函数，直接看 main 函数中的部分就可以清楚地知道该文件的流程
+- `main.c`：设计了四个测试样例去检验实验的准确性，就不贴出所有代码了，我将所有的过程都封装成了函数，直接看 main 函数中的部分就可以清楚地知道该文件的流程
 
   ```c
   int main() {
@@ -508,12 +507,14 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
       MD5(digest1, M1, MLen1); // MD5加密算法
       MD5(digest2, M2, MLen2); // MD5加密算法
       MD5(digest3, M3, MLen3); // MD5加密算法
+      MD5(digest4, M4, MLen4); // MD5加密算法
       print_MD5(); // 输出MD5加密算法结果
   
       // ----------- HMAC-MD5 -----------
       HMAC_MD5(hmac1, (uint8_t*)M1, MLen1, (uint8_t*)K1, KLen1, &err1); // HMAC-MD5算法
       HMAC_MD5(hmac2, (uint8_t*)M2, MLen2, (uint8_t*)K2, KLen2, &err2); // HMAC-MD5算法
       HMAC_MD5(hmac3, (uint8_t*)M3, MLen3, (uint8_t*)K3, KLen3, &err3); // HMAC-MD5算法
+      HMAC_MD5(hmac4, (uint8_t*)M4, MLen4, (uint8_t*)K4, KLen4, &err4); // HMAC-MD5算法
       print_HMAC_MD5(); // 输出HMAC-MD5算法结果
       return 0;
   }
@@ -527,11 +528,12 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
 
 ### 实验用例说明
 
-本次实验选择了三个测试样例，来验证算法的准确性
+本次实验选择了四个测试样例，来验证算法的准确性
 
 - `TEST1`：明文的位数模 512 < 448
 - `TEST2`：明文的位数模 512 > 448
 - `TEST3`：密钥的位数大于 512
+- `TEST4`：明文和密钥的长度都很长，都远大于 512 位
 
 ### 编译运行过程
 
@@ -549,6 +551,8 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
 
 <img src="./img/1.png" alt="1" style="zoom: 33%;" />
 
+<img src="./img/3.png" alt="3" style="zoom: 33%;" />
+
 ## 验证用例
 
 我找到了一个在线加密解密网站，可以通过输入明文信息和密钥，得到最后的输出结果，这样可以方便验证自己的结果是否正确，下面是对三个测试样例的验证：
@@ -564,6 +568,10 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
 
   - `TEST3`：与 `TEST1` 结果相同，就不做测试了
 
+  - `TEST4`：
+  
+    <img src="./img/5.png" alt="5" style="zoom:33%;" />
+
 - `HMAC-MD5`
 
   - `TEST1`：
@@ -578,7 +586,10 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
 
     <img src="./img/2.png" alt="2" style="zoom:33%;" />
 
+  - `TEST4`：
+
+    <img src="./img/4.png" alt="4" style="zoom:33%;" />
+
 ## 实验总结
 
 本次实验的难度适中，但是学会了如何用 c 去编写 MD5 和 HMAC-MD5 算法，对两个算法的流程有了更加深刻的理解，并且对 c 语言的库文件 `stdint.h` 中的数据类型运用更加熟悉。
-

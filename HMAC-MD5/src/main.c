@@ -4,12 +4,12 @@
 #include "MD5.h"
 #include "HMAC_MD5.h"
 
-const uint8_t *M1, *M2, *M3; // 明文
-const uint8_t *K1, *K2, *K3; // 密钥
-uint64_t MLen1, KLen1, MLen2, KLen2, MLen3, KLen3; // 明文、密文的长度
-uint8_t digest1[16], digest2[16], digest3[16]; // MD5输出得到的128位消息摘要
-uint8_t hmac1[16], hmac2[16], hmac3[16]; // HMAC-MD5输出得到的结果
-int err1 = 0; int err2 = 0; int err3 = 0; // 判断能否解密成功
+const uint8_t *M1, *M2, *M3, *M4; // 明文
+const uint8_t *K1, *K2, *K3, *K4; // 密钥
+uint64_t MLen1, KLen1, MLen2, KLen2, MLen3, KLen3, MLen4, KLen4; // 明文、密文的长度
+uint8_t digest1[16], digest2[16], digest3[16], digest4[16]; // MD5输出得到的128位消息摘要
+uint8_t hmac1[16], hmac2[16], hmac3[16], hmac4[16]; // HMAC-MD5输出得到的结果
+int err1 = 0; int err2 = 0; int err3 = 0; int err4 = 0; // 判断能否解密成功
 
 
 // 初始化明文、密钥
@@ -25,6 +25,11 @@ void init(){
     // test3: K的位长度大于512
     M3 = (uint8_t *)"iloveyou"; K3 = (uint8_t *)"serxjvhcvxkasdxhcvxncvxwerxjvhcvxkcvxwerxjvhcvxkcvxwerxjvhcvxkssewesdsfddf";
     MLen3 = strlen((const char *)M3); KLen3 = strlen((const char *)K3);
+
+    // test4: 明文和密钥长度都很长
+    M4 = (uint8_t *)"xzgvjxcbvxcbvshufhsdgckjxzcbvxchvosdiygfyfdguoasdkncjzxbvksdfheufhwsuidfjskdbcjkzxcbvkxzcbvmsdbfsadhfusgdfhjxbhvmxcnbvzkxjchasudhasifjxckbvxcmvbsdfhguisdgkzjxbckzxbczjxbczxc"; 
+    K4 = (uint8_t *)"zuxiczjxcnajhsohdvcvlnxcvjabsdiyasoichzxcndgdfpoiduvoixcjcasdbkhxvckkzxkhcozicozdckzxlchzxjklcjzlkxcsdfuhcjxvjxcvxbcvb";
+    MLen4 = strlen((const char *)M4); KLen4 = strlen((const char *)K4);
 }
 
 // 密钥长度过长超过512位
@@ -56,6 +61,13 @@ void print_MD5(){
     printf("明文: %s\n\n", M3);
     printf("MD5 加密后得到的信息摘要: ");
     for (int i = 0; i < 16; ++i) printf("%02x", digest3[i]);
+    printf("\n\n");
+
+    printf("----------- TEST4 -----------");
+    printf("\n\n");
+    printf("明文: %s\n\n", M4);
+    printf("MD5 加密后得到的信息摘要: ");
+    for (int i = 0; i < 16; ++i) printf("%02x", digest4[i]);
     printf("\n\n");
 }
 
@@ -95,6 +107,17 @@ void print_HMAC_MD5(){
         for (int i = 0; i < 16; ++i) printf("%02x", hmac3[i]);
         printf("\n\n");
     }
+
+    printf("----------- TEST4 -----------");
+    printf("\n\n");
+    printf("明文: %s\n\n", M4);
+    printf("密钥: %s\n\n", K4);
+    if (err4) print_ERROR();
+    else {  
+        printf("HMAC-MD5 加密后得到的结果: ");
+        for (int i = 0; i < 16; ++i) printf("%02x", hmac4[i]);
+        printf("\n\n");
+    }
 }
 
 int main() {
@@ -104,12 +127,14 @@ int main() {
     MD5(digest1, M1, MLen1); // MD5加密算法
     MD5(digest2, M2, MLen2); // MD5加密算法
     MD5(digest3, M3, MLen3); // MD5加密算法
+    MD5(digest4, M4, MLen4); // MD5加密算法
     print_MD5(); // 输出MD5加密算法结果
 
     // ----------- HMAC-MD5 -----------
     HMAC_MD5(hmac1, (uint8_t*)M1, MLen1, (uint8_t*)K1, KLen1, &err1); // HMAC-MD5算法
     HMAC_MD5(hmac2, (uint8_t*)M2, MLen2, (uint8_t*)K2, KLen2, &err2); // HMAC-MD5算法
     HMAC_MD5(hmac3, (uint8_t*)M3, MLen3, (uint8_t*)K3, KLen3, &err3); // HMAC-MD5算法
+    HMAC_MD5(hmac4, (uint8_t*)M4, MLen4, (uint8_t*)K4, KLen4, &err4); // HMAC-MD5算法
     print_HMAC_MD5(); // 输出HMAC-MD5算法结果
     return 0;
 }
