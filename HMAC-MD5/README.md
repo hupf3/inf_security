@@ -280,7 +280,7 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
         bits = MLen * 8; // 明文的位数
         uint64_t r = bits % 512; // 取余
         // 计算分成的块数
-        if (r <= 448) blocksNum = bits / 512 + 1;
+        if (r < 448) blocksNum = bits / 512 + 1;
         else blocksNum = bits / 512 + 2;
     }
     ```
@@ -538,7 +538,7 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
 
 运行结果如下所示：
 
-<img src="./img/image-20201118110522707.png" alt="image-20201118110522707" style="zoom: 33%;" />
+<img src="./img/image-20201118124609568.png" alt="image-20201118124609568" style="zoom: 33%;" />
 
 ## 验证用例
 
@@ -551,7 +551,7 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
 
   - `TEST2`：
 
-    <img src="./img/image-20201118111526169.png" alt="image-20201118111526169" style="zoom:33%;" />
+    <img src="./img/image-20201118124412128.png" alt="image-20201118124412128" style="zoom:33%;" />
 
   - `TEST3`：与 `TEST1` 结果相同，就不做测试了
 
@@ -563,7 +563,7 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
 
   - `TEST2`：
 
-    <img src="./img/image-20201118111751253.png" alt="image-20201118111751253" style="zoom:33%;" />
+    <img src="./img/image-20201118124446862.png" alt="image-20201118124446862" style="zoom:33%;" />
 
   - `TEST3`：密钥长度过长
 

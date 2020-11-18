@@ -15,7 +15,7 @@ void fill(const uint8_t *M, uint64_t MLen){
     bits = MLen * 8; // 明文的位数
     uint64_t r = bits % 512; // 取余
     // 计算分成的块数
-    if (r <= 448) blocksNum = bits / 512 + 1;
+    if (r < 448) blocksNum = bits / 512 + 1;
     else blocksNum = bits / 512 + 2;
 }
 

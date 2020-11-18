@@ -19,7 +19,7 @@ void init(){
     MLen1 = strlen((const char *)M1); KLen1 = strlen((const char *)K1);
 
     // test2: M的位数余512大于448
-    M2 = (uint8_t *)"serxjvhcvxkcvxwerxjvhcvxkcvxwerxjvhcvxkcvxwerxjvhcvxksse"; K2 = (uint8_t *)"mykey";
+    M2 = (uint8_t *)"serxjvhcvxkcvxwerxjvhcvxkcvxwerxjvhcvxkcvxwerxjvhcvxkssesdfsf"; K2 = (uint8_t *)"mykey";
     MLen2 = strlen((const char *)M2); KLen2 = strlen((const char *)K2);
 
     // test3: K的位长度大于512
