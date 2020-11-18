@@ -35,6 +35,7 @@ void getSo(){
     memcpy(So + 64, Si + 64, 16); // 得到 So ‖ H(Si ‖ M)
 }
 
+// HMAC-MD5 算法
 void HMAC_MD5(uint8_t *hmac, const uint8_t *M, uint64_t MLen, const uint8_t *K, uint64_t KLen, int *err) {
     initData(MLen);                 // 数据初始化
     checkKLen(err, KLen);           // 检测密钥K的长度
