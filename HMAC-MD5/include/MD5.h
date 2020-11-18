@@ -19,7 +19,6 @@ uint64_t bits; // 明文的位数
 uint32_t T[64]; // T表
 uint32_t reg[4]; // 初始寄存器A、B、C、D
 uint32_t regCur[4]; // 当前寄存器A、B、C、D
-// uint8_t digest[16]; // 输出得到的128位消息摘要
 
 // 初始化T表
 void init_T();
