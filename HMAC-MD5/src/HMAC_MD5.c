@@ -19,8 +19,17 @@ void checkKLen(int *err, int KLen){ if (KLen > 64) *err = 1; }
 
 // 补零
 void fillZero(uint64_t MLen, const uint8_t *K, uint64_t KLen){
-    memcpy(KPlus, K, KLen);
-    memset(KPlus + KLen, 0, (64 - KLen) * sizeof(uint8_t)); // 后方补零
+    // 如果KLen长度大于512需要先进行摘要算法
+    if (KLen > 64){
+        uint8_t *digestT = (uint8_t*)malloc(16 * sizeof(uint8_t));
+        MD5(digestT, K, KLen);
+        memcpy(KPlus, digestT, 16);
+        memset(KPlus + 16, 0, 48 * sizeof(uint8_t)); // 后方补零
+    }
+    else {
+        memcpy(KPlus, K, KLen);
+        memset(KPlus + KLen, 0, (64 - KLen) * sizeof(uint8_t)); // 后方补零
+    }
 }
 
 // K+与ipad异或生成Si，并生成(Si ‖ M)
@@ -38,8 +47,8 @@ void getSo(){
 // HMAC-MD5 算法
 void HMAC_MD5(uint8_t *hmac, const uint8_t *M, uint64_t MLen, const uint8_t *K, uint64_t KLen, int *err) {
     initData(MLen);                 // 数据初始化
-    checkKLen(err, KLen);           // 检测密钥K的长度
-    if (*err == 1) return ;         // 不符合退出算法
+    // checkKLen(err, KLen);           // 检测密钥K的长度
+    // if (*err == 1) return ;         // 不符合退出算法
     
     // HMAC-MD5 算法过程
     fillZero(MLen, K, KLen);        // 补零

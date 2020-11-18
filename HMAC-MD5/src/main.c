@@ -23,7 +23,7 @@ void init(){
     MLen2 = strlen((const char *)M2); KLen2 = strlen((const char *)K2);
 
     // test3: K的位长度大于512
-    M3 = (uint8_t *)"iloveyou"; K3 = (uint8_t *)"serxjvhcvxkcvxwerxjvhcvxkcvxwerxjvhcvxkcvxwerxjvhcvxkssewesdsfddf";
+    M3 = (uint8_t *)"iloveyou"; K3 = (uint8_t *)"serxjvhcvxkasdxhcvxncvxwerxjvhcvxkcvxwerxjvhcvxkcvxwerxjvhcvxkssewesdsfddf";
     MLen3 = strlen((const char *)M3); KLen3 = strlen((const char *)K3);
 }
 

@@ -440,12 +440,21 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
     void checkKLen(int *err, int KLen){ if (KLen > 64) *err = 1; }
     ```
 
-  - `void fillZero();`：对密钥补零
+  - `void fillZero();`：对密钥补零，如果 KLen 长度大于 512 需要先进行摘要算法(MD5)
 
     ```c
     void fillZero(uint64_t MLen, const uint8_t *K, uint64_t KLen){
-        memcpy(KPlus, K, KLen);
-        memset(KPlus + KLen, 0, (64 - KLen) * sizeof(uint8_t)); // 后方补零
+        // 如果KLen长度大于512需要先进行摘要算法
+        if (KLen > 64){
+            uint8_t *digestT = (uint8_t*)malloc(16 * sizeof(uint8_t));
+            MD5(digestT, K, KLen);
+            memcpy(KPlus, digestT, 16);
+            memset(KPlus + 16, 0, 48 * sizeof(uint8_t)); // 后方补零
+        }
+        else {
+            memcpy(KPlus, K, KLen);
+            memset(KPlus + KLen, 0, (64 - KLen) * sizeof(uint8_t)); // 后方补零
+        }
     }
     ```
 
@@ -522,7 +531,7 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
 
 - `TEST1`：明文的位数模 512 < 448
 - `TEST2`：明文的位数模 512 > 448
-- `TEST3`：密钥的位数大于 512 而无法填充生成 $K^+$
+- `TEST3`：密钥的位数大于 512
 
 ### 编译运行过程
 
@@ -538,7 +547,7 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
 
 运行结果如下所示：
 
-<img src="./img/image-20201118124609568.png" alt="image-20201118124609568" style="zoom: 33%;" />
+<img src="./img/1.png" alt="1" style="zoom: 33%;" />
 
 ## 验证用例
 
@@ -565,7 +574,9 @@ HMAC 是密钥相关的哈希运算消息认证码（Hash-based Message Authenti
 
     <img src="./img/image-20201118124446862.png" alt="image-20201118124446862" style="zoom:33%;" />
 
-  - `TEST3`：密钥长度过长
+  - `TEST3`：
+
+    <img src="./img/2.png" alt="2" style="zoom:33%;" />
 
 ## 实验总结
 
