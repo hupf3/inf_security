@@ -3,11 +3,13 @@
 #include "DES.h"
 #include "Data.h"
 
-int get(long long d, int index) { return (d >> (63 - index)) & 1; }
+// 获取
+int get(long long data, int index) { return (data >> (63 - index)) & 1; }
 
-void set(long long *d, int index, int value) {
-    *d &= ~(1ll << (63 - index));
-    *d |= (((long long)value) << (63 - index));
+// 设值
+void set(long long *data, int index, int v) {
+    *data &= ~(1ll << (63 - index));
+    *data |= (((long long)v) << (63 - index));
 }
 
 // 置换
@@ -27,23 +29,23 @@ void permuteRIP(long long input, long long *output) {
 }
 
 // 循环左移一个位置
-void rotateLeft1Bit(long long *key, int k) {
-    int tmp = get(*key, 0 + k * 28);
-    for (int i = 0 + k * 28; i < 27 + k * 28; ++i) set(key, i, get(*key, i + 1));
-    set(key, 27 + k * 28, tmp);
+void rotateLeft1Bit(long long *keyLL, int k) {
+    int tmp = get(*keyLL, 0 + k * 28);
+    for (int i = 0 + k * 28; i < 27 + k * 28; ++i) set(keyLL, i, get(*keyLL, i + 1));
+    set(keyLL, 27 + k * 28, tmp);
 }
 
 // 循环左移
-void rotateLeft(int i, long long *key, int k) {
-    rotateLeft1Bit(key, k);
+void rotateLeft(int i, long long *keyLL, int k) {
+    rotateLeft1Bit(keyLL, k);
     if (i == 1 || i == 2 || i == 9 || i == 16) return;
-    else rotateLeft1Bit(key, k);
+    else rotateLeft1Bit(keyLL, k);
 }
 
 // 生成子密钥
-void generateSubKey(const long long key, long long* subKey) {
+void generateSubKey(const long long keyLL, long long* subKey) {
     long long tmp;
-    permute(key, (int*)tablePC1, 56, &tmp);
+    permute(keyLL, (int*)tablePC1, 56, &tmp);
     for (int i = 1; i <= 16; ++i) {
         rotateLeft(i, &tmp, 0);
         rotateLeft(i, &tmp, 1);
@@ -76,20 +78,20 @@ void feistel(long long R,const long long K,long long *output) {
 }
 
 // 16轮迭代序列T
-void Iterative_seq(long long data, const long long key, long long *output) {
+void Iterative_seq(long long data, const long long keyLL, long long *output) {
     long long high = 0ll;
     for (int i = 0; i < 32; ++i) set(&high, i, get(data, 32 + i)); 
-    feistel(high, key, output);
+    feistel(high, keyLL, output);
     for (int i = 0; i < 32; ++i) {
         set(output, 32 + i, get(*output, i) ^ get(data, i));
         set(output, i, get(high, i));
     }
 }
 
-void DES(long long input, const long long key, long long *output, int flag) {
+void DES(long long input, const long long keyLL, long long *output, int flag) {
     // 生成子密钥
     long long subKey[16];
-    generateSubKey(key, (long long*)subKey);
+    generateSubKey(keyLL, (long long*)subKey);
 
     // IP置换
     permuteIP(input, output);
@@ -110,20 +112,22 @@ void DES(long long input, const long long key, long long *output, int flag) {
     permuteRIP(*output,output);
 }
 
-void toData(const char* block, long long *d, int len){
+// 将字符串输入转化成LL
+void stringToLL(const char* input, long long *data, int len){
     char buf[9];
     int i; 
-    for (i = 0; i < len && i < 8; ++i) buf[i] = block[i];
+    for (i = 0; i < len && i < 8; ++i) buf[i] = input[i];
     i = 8 - len;
     while (len < 8) buf[len++] = i;
     long long tmp = *((long long*)buf);
-    for (i = 0; i < 64; ++i) set(d, i, (tmp >> (63 - (56 - i / 8 * 8 + i % 8))) & 1);
+    for (i = 0; i < 64; ++i) set(data, i, (tmp >> (63 - (56 - i / 8 * 8 + i % 8))) & 1);
 }
 
-void printData(long long d, char* buf){
+// 将LL转变为字符串
+void LLToString(long long data, char* buf){
     long long *tmp = (long long*)buf;
     int i, j;
-    for (i = 0; i < 64; ++i) set(tmp, 56 - i / 8 * 8 + i % 8, get(d, i));
+    for (i = 0; i < 64; ++i) set(tmp, 56 - i / 8 * 8 + i % 8, get(data, i));
     for (i = buf[7], j = 1; j < i; ++j){
         if (buf[7 - j] != i) i = 0;
     }
@@ -134,32 +138,32 @@ void printData(long long d, char* buf){
 }
 
 // 加密
-int Encrypt(const char *k, const char *msg, int len, char *output){
+int Encrypt(const char *key, const char *msg, int len, char *output){
     char input[200];
     memcpy(input, msg, (len + 1)*sizeof(char));
-    long long key; 
-    toData(k, (long long*)&key, strlen(k));
+    long long keyLL; 
+    stringToLL(key, (long long*)&keyLL, strlen(key));
     long long data, encoded;
     for (int i = 0 ; i < len / 8 + 1 ; ++i){
-        toData(&input[8 * i], &data, len - i * 8);
-        DES(data, key, &encoded, 0);
-        printData(encoded, &output[8 * i]);
+        stringToLL(&input[8 * i], &data, len - i * 8);
+        DES(data, keyLL, &encoded, 0);
+        LLToString(encoded, &output[8 * i]);
     }
     output[(len / 8 + 1) * 64] = '\0';
     return (len / 8 + 1) * 8;
 }
 
 // 解密
-void Decrypt(const char *k, const char *msg, int len, char *output){
+void Decrypt(const char *key, const char *msg, int len, char *output){
     char input[200];
     memcpy(input, msg, (len + 1)*sizeof(char));
-    long long key; 
-    toData(k, (long long*)&key, strlen(k));
+    long long keyLL; 
+    stringToLL(key, (long long*)&keyLL, strlen(key));
     long long data, decoded;
     for (int i = 0 ; i < len / 8; ++i){
-        toData(&input[8 * i], &data, len - i * 8);
-        DES(data, key, &decoded, 1);
-        printData(decoded, &output[8 * i]);
+        stringToLL(&input[8 * i], &data, len - i * 8);
+        DES(data, keyLL, &decoded, 1);
+        LLToString(decoded, &output[8 * i]);
     }
     output[len / 8 * 64] = '\0';
 }
