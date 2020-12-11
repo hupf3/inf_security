@@ -17,42 +17,49 @@
 
 int serverSocket; // 服务端Socket
 
+// 服务器端密钥
 char TGS_Key[] = "TGSKey";
 char SS_Key[] = "SSKey";
+
 char SS_Session_Key[] = "Client-SSSessionKey"; // SS服务器对话密钥
 
 // TGS服务器端进行通信
 void serve(struct sockaddr_in *client_addr, int clientSocket){
+    // 时间戳
     time_t timestamp1 = 0;
     time_t timestamp2 = 0;
     int len = -1;
-    char B[100], C[100], D[100], E[100], F[100];
-    char ServiceID[100];
+    char B[100], C[100], D[100], E[100], F[100]; // 消息
+    char ServiceID[100]; // 服务ID
     char ClientID1[100]; char ClientID2[100];
     char client_net_addr[100];
-    char TGS_Session_Key[100];
+    char TGS_Session_Key[100]; // 会话密钥
 
     // 读取消息C
     int lenC = recv(clientSocket, C, 100, 0);
+    printf("成功接收消息C! \n");
     C[lenC] = 0;
 
     // 读取消息C中的信息获取消息B
     sscanf(C, "%[^,],%s", ServiceID, B);
     for (int i = strlen(ServiceID) + 1; i < lenC; ++i) B[i - (strlen(ServiceID) + 1)] = C[i];
     B[lenC - (strlen(ServiceID) + 1)] = 0;
+    printf("读取消息C中的ServiceID为: %s\n", ServiceID);
 
     // 解密消息B，并且读取B消息中的数据
     Decrypt(TGS_Key, B, (lenC - strlen(ServiceID) - 1), B);
     sscanf(B, "<%[^,],%[^,],%ld,%[^>]>", ClientID1, client_net_addr, &timestamp1, TGS_Session_Key);
+    printf("通过TGS密钥解密得到的消息B为: %s\n", B);
 
     // 读取消息D
     int lenD = recv(clientSocket, D, 100, 0);
+    printf("成功接收消息D! \n");
     D[lenD] = 0;
 
     // 解密消息D，并且读取消息D中的数据
     Decrypt(TGS_Session_Key, D, lenD, D);
+    printf("通过Client-TGS会话密钥解密得到的消息D为: %s\n", D);
     sscanf(D,"<%[^,],%ld,>", ClientID2, &timestamp2);
-    printf("消息D <%s,%ld>\n",ClientID2,timestamp2);
 
     // 需要对消息中的信息进行认证
     // 用户ID不一致
@@ -69,19 +76,24 @@ void serve(struct sockaddr_in *client_addr, int clientSocket){
     char ST[100]; // 服务票据
     sprintf(ST, "<%s,%s,%ld,%s>", ClientID1, client_net_addr, timestamp2, SS_Session_Key);
     // 对服务票据进行加密
+    printf("TGS服务器生成的服务票据ST为: %s\n", ST);
+    printf("正在用SS密钥对ST进行加密...\n");
     int lenST = Encrypt(SS_Key, ST, strlen(ST), ST);
 
+    printf("正在向客户端发送由ServiceID和ST构成的消息E...\n");
     // 生成消息E，并且发送给客户端
     sprintf(E, "%s,%s", ServiceID, ST);
     int lenE = strlen(ServiceID) + 1 + lenST;
     E[lenE] = 0;
     send(clientSocket, E, lenE, 0);
 
-    sleep(2); // 等待客户端接收
+    sleep(3); // 等待客户端接收
 
     // 加密生成消息F,并且发送给客户端
+    printf("Client-SS会话密钥为: %s\n", SS_Session_Key);
     int lenF = Encrypt(TGS_Session_Key, SS_Session_Key, strlen(SS_Session_Key), F);
     F[lenF] = 0;
+    printf("正在向客户端发送由Client-TGS会话密钥加密得到的消息E...\n");
     send(clientSocket, F, lenF, 0);
 }
 
@@ -90,6 +102,8 @@ int main(){
     struct sockaddr_in TGS_addr;
     int addr_len = sizeof(struct sockaddr_in);
     pid_t pid;
+
+    printf("等待与客户端建立连接...\n");
 
     // 设置socked
     if ((serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == -1){
@@ -119,9 +133,14 @@ int main(){
         struct sockaddr_in client_addr;
         int clientSocket = accept(serverSocket, (struct sockaddr *)&client_addr, (socklen_t *)&addr_len);
         
+        printf("成功与客户端建立连接! \n");
+
         pid = fork(); // 创建子进程
         if (pid == 0){
             serve(&client_addr, clientSocket);
+            printf("当前服务结束! \n");
+            printf("---------------------\n");
+            printf("等待与客户端建立连接...\n");
             exit(1);
         }
     }

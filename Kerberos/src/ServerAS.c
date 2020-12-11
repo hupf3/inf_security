@@ -19,18 +19,19 @@ int serverSocket; // 服务端Socket
 
 char ClientID[] = "hupf3"; // AS服务器存储的用户名
 char ClientKey[] = "MYKey"; // AS服务器存储的密钥
-char TGS_Session_Key[] = "Client-TGSSessionKey";
-char TGS_Key[] = "TGSKey";
+char TGS_Session_Key[] = "Client-TGSSessionKey"; // 会话密钥
+char TGS_Key[] = "TGSKey"; // 服务端密钥
 
 // AS服务器端进行通信
 void serve(struct sockaddr_in *client_addr, int clientSocket){
     int len = -1; // 存储接受到的字节长度
     char rec[100]; // 接受到的数据
-    char A[100], B[100];
+    char A[100], B[100]; // 消息
 
     // 接收数据
     while (len < 0) len = recv(clientSocket, rec, 100, 0);
     rec[len] = '\0';
+    printf("成功接收数据，用户ID为: %s\n", rec);
 
     // 断开连接
     if (strcmp(rec, "quit") == 0) return ;
@@ -41,15 +42,21 @@ void serve(struct sockaddr_in *client_addr, int clientSocket){
         return ;
     }
 
+    printf("服务器端存有该用户ID: %s, 且密钥为: %s\n", ClientID, ClientKey);
+
+    printf("Client-TGS会话密钥为: %s\n", TGS_Session_Key);
+    printf("正在进行加密发送给客户端消息A...\n");
     // 发送加密后的消息A，即Client/TGS会话密钥
     int lenA = Encrypt(ClientKey, TGS_Session_Key, strlen(TGS_Session_Key), A);
     send(clientSocket, A, lenA, 0);
 
-    sleep(2); // 等待客户端接收
+    sleep(3); // 等待客户端接收
 
     // 发送消息B，即票据授权票据(TGT)
     char tmpB[100];
-    sprintf(B, "<%s,%s,%ld,%s>", ClientID, inet_ntoa(client_addr->sin_addr), time(NULL)+1231232, TGS_Session_Key);
+    sprintf(B, "<%s,%s,%ld,%s>", ClientID, inet_ntoa(client_addr->sin_addr), time(NULL) + 123456, TGS_Session_Key);
+    printf("消息B为: %s\n", B);
+    printf("正在进行加密发送给客户端消息B...\n");
     int lenB = Encrypt(TGS_Key, B, strlen(B), B);
     send(clientSocket, B, lenB, 0);
 }
@@ -59,6 +66,8 @@ int main(){
     struct sockaddr_in AS_addr;
     int addr_len = sizeof(struct sockaddr_in);
     pid_t pid;
+
+    printf("等待与客户端建立连接...\n");
 
     // 设置socked
     if ((serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == -1){
@@ -87,10 +96,14 @@ int main(){
     while (1){
         struct sockaddr_in client_addr;
         int clientSocket = accept(serverSocket, (struct sockaddr *)&client_addr, (socklen_t *)&addr_len);
-        
+        printf("成功与客户端建立连接! \n");
+
         pid = fork(); // 创建子进程
         if (pid == 0){
             serve(&client_addr, clientSocket);
+            printf("当前服务结束! \n");
+            printf("---------------------\n");
+            printf("等待与客户端建立连接...\n");
             exit(1);
         }
     }
