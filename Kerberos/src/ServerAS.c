@@ -38,6 +38,7 @@ void serve(struct sockaddr_in *client_addr, int clientSocket){
 
     // 检查服务器中是否有ClientID，没有则须返回错误信息
     if (strcmp(rec, ClientID) != 0){
+        printf("本服务器数据库中无该用户ID! \n");
         send(clientSocket, "Wrong ClientID!", strlen("Wrong ClientID!"), 0);
         return ;
     }

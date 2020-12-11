@@ -76,7 +76,7 @@ void connectWithAS(){
     A[len] = 0;
 
     // 检测ClientID是否符合条件
-    if (strcmp(A, "Wrong ClientID! \n") == 0){
+    if (strcmp(A, "Wrong ClientID!") == 0){
         printf("ClientID 不存在! \n");
         exit(1);
     }
