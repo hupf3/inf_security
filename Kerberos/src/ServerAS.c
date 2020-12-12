@@ -15,12 +15,49 @@
 
 #define AS_PORT 8081
 
+// 保存用户ID和密码的数据结构
+typedef struct Client{
+    char *ID;
+    char *key;
+}Client;
+
+Client c[5];
+
 int serverSocket; // 服务端Socket
 
-char ClientID[] = "hupf3"; // AS服务器存储的用户名
-char ClientKey[] = "MYKey"; // AS服务器存储的密钥
+char *ClientID; // AS服务器存储的用户名
+char *ClientKey; // AS服务器存储的密钥
 char TGS_Session_Key[] = "Client-TGSSessionKey"; // 会话密钥
 char TGS_Key[] = "TGSKey"; // 服务端密钥
+
+// 创建数据库中的数据
+void createData(){
+    c[0].ID = "hupengfei"; c[0].key = "MYKey1";
+    c[1].ID = "huran"; c[1].key = "MYKey2";
+    c[2].ID = "chenxiaolin"; c[2].key = "MYKey3";
+    c[3].ID = "huangrui"; c[3].key = "MYKey4";
+    c[4].ID = "lizihao"; c[4].key = "MYKey5";
+}
+
+// 判断数据库中是否有该数据 
+// 0 : 不存在   
+// 1 : 存在
+int isInclude(char *ss){
+    for (int i = 0; i < 5; ++i)
+        if (strcmp(ss, c[i].ID) == 0) return 1;
+    return 0;
+}
+
+// 获取该用户信息
+void getClient(char *ss){
+    for (int i = 0; i < 5; ++i){
+        if (strcmp(ss, c[i].ID) == 0){
+            ClientID = c[i].ID;
+            ClientKey = c[i].key;
+            return ;
+        }
+    }
+}
 
 // AS服务器端进行通信
 void serve(struct sockaddr_in *client_addr, int clientSocket){
@@ -33,15 +70,16 @@ void serve(struct sockaddr_in *client_addr, int clientSocket){
     rec[len] = '\0';
     printf("成功接收数据，用户ID为: %s\n", rec);
 
-    // 断开连接
-    if (strcmp(rec, "quit") == 0) return ;
+    int flag = isInclude(rec);
 
     // 检查服务器中是否有ClientID，没有则须返回错误信息
-    if (strcmp(rec, ClientID) != 0){
+    if (flag == 0){
         printf("本服务器数据库中无该用户ID! \n");
         send(clientSocket, "Wrong ClientID!", strlen("Wrong ClientID!"), 0);
         return ;
     }
+
+    getClient(rec); // 获取该用户信息
 
     printf("服务器端存有该用户ID: %s, 且密钥为: %s\n", ClientID, ClientKey);
 
@@ -68,9 +106,11 @@ int main(){
     int addr_len = sizeof(struct sockaddr_in);
     pid_t pid;
 
+    createData();
+
     printf("等待与客户端建立连接...\n");
 
-    // 设置socked
+    // 设置socket
     if ((serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == -1){
         perror("Socket Error!\n");
         exit(1);

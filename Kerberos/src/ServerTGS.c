@@ -105,7 +105,7 @@ int main(){
 
     printf("等待与客户端建立连接...\n");
 
-    // 设置socked
+    // 设置socket
     if ((serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == -1){
         perror("Socket Error!\n");
         exit(1);

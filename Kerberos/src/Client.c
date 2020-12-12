@@ -20,8 +20,8 @@
 
 int clientSocket; // 客户端Socket
 int addr_len;
-char ClientID[] = "hupf3"; // 客户ID
-char userKey[] = "MYKey"; // 客户端密钥
+char ClientID[100]; // 客户ID
+char userKey[100]; // 客户端密钥
 char ServiceID[] = "Sun_Yat-sen_University"; // 服务ID
 
 // 时间戳
@@ -135,9 +135,9 @@ void connectWithTGS(){
     sleep(3); // 等待服务器端接收
 
     // 消息D是由ClientID和timestamp经过TGS_Session_Key加密后得到的
+    sprintf(D, "<%s,%ld>", ClientID, timestamp1);
     printf("消息D为: %s\n", D);
     printf("正在进行加密发送给TGS服务器消息D...\n");
-    sprintf(D, "<%s,%ld>", ClientID, timestamp1);
     lenD = Encrypt(TGS_Session_Key, D, strlen(D), D);
 
     // 发送消息D
@@ -233,8 +233,10 @@ int main(){
     timestamp1 = time(NULL);
     addr_len = sizeof(struct sockaddr_in);
 
-    printf("用户输入账户为: %s\n", ClientID);
-    printf("用户输入密码为: %s\n", userKey);
+    printf("请输入用户账户: ");
+    scanf("%s", ClientID);
+    printf("请输入用户密码: ");
+    scanf("%s", userKey);
 
     connectWithAS(); // 与AS服务其建立联系
     connectWithTGS(); // 与TGS服务其建立联系
